@@ -234,7 +234,7 @@ object FiberRefs {
    * `FiberRefStackEntry` as much as possible.
    */
   private[zio] final case class FiberRefStack[@specialized(SpecializeInt) A] private[FiberRefs] (
-    headFiberId: FiberId.Runtime,
+    private val headFiberId: FiberId.Runtime, // Doesn't compile with the `private val` but does compile without it
     headValue: A,
     headVersion: Int,
     tail: List[FiberRefStackEntry[?]],
