@@ -472,7 +472,7 @@ sealed trait ZIO[-R, +E, +A]
    * `FiberRef` values.
    */
   def diffFiberRefs(implicit trace: Trace): ZIO[R, E, (FiberRefs.Patch, A)] =
-    summarized(ZIO.getFiberRefs)(FiberRefs.Patch.diff)
+    summarized(ZIO.getFiberRefs)(_ diff _)
 
   /**
    * Returns an effect that is always interruptible, but whose interruption will
@@ -2541,7 +2541,7 @@ sealed trait ZIO[-R, +E, +A]
             )
             .forkDaemon
 
-        fork(self, false).zip(fork(that, true)).flatMap { case (left, right) =>
+        (fork(self, side = false) zip fork(that, side = true)).flatMap { case (left, right) =>
           restore(promise.await).foldCauseZIO(
             cause =>
               left.interruptFork *> right.interruptFork *>

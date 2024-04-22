@@ -40,8 +40,8 @@ object BenchmarkUtil extends Runtime[Any] { self =>
   }
 
   private object NoFiberRootsRuntime extends Runtime[Any] {
-    val environment  = Runtime.default.environment
-    val fiberRefs    = Runtime.default.fiberRefs
-    val runtimeFlags = RuntimeFlags(RuntimeFlag.CooperativeYielding, RuntimeFlag.Interruption)
+    override val environment: ZEnvironment[Any] = Runtime.default.environment
+    override val fiberRefs: FiberRefs           = Runtime.default.fiberRefs
+    override val runtimeFlags: RuntimeFlags     = RuntimeFlags(RuntimeFlag.CooperativeYielding, RuntimeFlag.Interruption)
   }
 }

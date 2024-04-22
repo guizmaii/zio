@@ -191,7 +191,7 @@ trait Runtime[+R] { self =>
     private def makeFiber[E, A](
       zio: ZIO[R, E, A]
     )(implicit trace: Trace, unsafe: Unsafe): internal.FiberRuntime[E, A] = {
-      val fiberId   = FiberId.make(trace)
+      val fiberId = FiberId.make(trace)
       // TODO Jules: Inspect deeper
       val fiberRefs = self.fiberRefs.updatedAs(fiberId)(FiberRef.currentEnvironment, environment)
       val fiber     = FiberRuntime[E, A](fiberId, fiberRefs.forkAs(fiberId), runtimeFlags)
@@ -231,9 +231,9 @@ object Runtime extends RuntimePlatformSpecific {
     runtimeFlags0: RuntimeFlags
   ): Runtime[R] =
     new Runtime[R] {
-      val environment           = r
-      override val fiberRefs    = fiberRefs0
-      override val runtimeFlags = runtimeFlags0
+      override final val environment: ZEnvironment[R] = r
+      override final val fiberRefs: FiberRefs         = fiberRefs0
+      override final val runtimeFlags: RuntimeFlags   = runtimeFlags0
     }
 
   /**
@@ -328,11 +328,10 @@ object Runtime extends RuntimePlatformSpecific {
     }
   }
 
-  class Proxy[+R](underlying: Runtime[R]) extends Runtime[R] {
-    def environment = underlying.environment
-    def fiberRefs   = underlying.fiberRefs
-
-    def runtimeFlags = underlying.runtimeFlags
+  final class Proxy[+R](underlying: Runtime[R]) extends Runtime[R] {
+    override def environment: ZEnvironment[R] = underlying.environment
+    override def fiberRefs: FiberRefs         = underlying.fiberRefs
+    override def runtimeFlags: RuntimeFlags   = underlying.runtimeFlags
   }
 
   /**
